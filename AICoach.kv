@@ -1,0 +1,277 @@
+Interface:
+
+<Interface>:
+    id: sm
+    init_sc: init_sc.__self__
+    source_sc: source_sc.__self__
+
+    MDScreen:
+        id: init_sc
+        name: "init_screen"
+
+        MDTopAppBar:
+            markup: True
+            title: "[font=Roboto]SELECT EXERCISE[font=Roboto]"
+            anchor_title: "center"
+            pos_hint: {"top": 1}
+            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Theme"]]
+            left_action_items: [["alert-circle-outline", lambda x: root.switch_to(tutorial_sc, direction='left'), "Tutorial"]]
+
+        MDBoxLayout:
+            orientation: "vertical"
+            size_hint: 0.8, 0.5
+            pos_hint: {"top": 0.7, "right": 0.9}
+            spacing: 30
+
+            MDCard:
+                md_bg_color: app.theme_cls.primary_light
+                size_hint: 1, 0.9
+                spacing: 10
+                padding: [10, 0, 20, 0]
+
+                Image:
+                    source: "./img/deadlift_icon.png"
+                    size_hint: 0.3, 1
+
+                MDRectangleFlatButton:
+                    name: "deadlift_btn"
+                    text_color: (0, 0, 0, 1)
+                    line_color: (0, 0, 0, 1)
+                    text: "[font=Roboto]CONVENTIONAL DEADLIFT[font=Roboto]"
+                    font_size: 0.04 * self.parent.width
+                    size_hint: 0.7, 0.5
+                    pos_hint: {"top": 0.75}
+                    on_release: app.select_exercise(self, source_sc)
+
+            MDCard:
+                md_bg_color: app.theme_cls.primary_light
+                size_hint: 1, 0.9
+                spacing: 10
+                padding: [10, 0, 20, 0]
+
+                Image:
+                    source: "./img/squat_icon.png"
+                    size_hint: 0.3, 0.9
+                    pos_hint: {"top": 0.95}
+
+                MDRectangleFlatButton:
+                    name: "squat_btn"
+                    text_color: (0, 0, 0, 1)
+                    line_color: (0, 0, 0, 1)
+                    text: "[font=Roboto]BACK SQUAT[font=Roboto]"
+                    font_size: 0.04 * self.parent.width
+                    size_hint: 0.7, 0.5
+                    pos_hint: {"top": 0.75}
+                    on_release: app.select_exercise(self, source_sc)
+
+    MDScreen:
+        id: source_sc
+        name: "source_screen"
+
+        MDTopAppBar:
+            markup: True
+            title: "[font=Roboto]SELECT SOURCE[font=Roboto]"
+            anchor_title: "center"
+            pos_hint: {"top": 1}
+            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Theme"]]
+            left_action_items: [["chevron-double-left", lambda x: root.switch_to(init_sc, direction='right'), "Change exercise"]]
+
+        MDBoxLayout:
+            orientation: "vertical"
+            size_hint: 0.8, 0.5
+            pos_hint: {"top": 0.7, "right": 0.9}
+            spacing: 30
+
+            MDCard:
+                md_bg_color: app.theme_cls.primary_light
+                size_hint: 1, 0.9
+                spacing: 10
+                padding: [10, 0, 20, 0]
+
+                Image:
+                    source: "./img/live_icon.png"
+                    size_hint: 0.4, 0.8
+                    pos_hint: {"top": 0.9}
+
+                MDRectangleFlatButton:
+                    id: live_workout_btn
+                    text_color: (0, 0, 0, 1)
+                    line_color: (0, 0, 0, 1)
+                    text: "[font=Roboto]LIVE WORKOUT[font=Roboto]"
+                    font_size: 0.035 * self.parent.width
+                    size_hint: 0.6, 0.5
+                    pos_hint: {"top": 0.75}
+                    on_release: app.live_workout(camera_sc)
+
+            MDCard:
+                md_bg_color: app.theme_cls.primary_light
+                size_hint: 1, 0.9
+                spacing: 10
+                padding: [10, 0, 20, 0]
+
+                Image:
+                    source: "./img/upload_icon.png"
+                    size_hint: 0.4, 0.8
+                    pos_hint: {"top": 0.9}
+
+                MDRectangleFlatButton:
+                    id: upload_btn
+                    text_color: (0, 0, 0, 1)
+                    line_color: (0, 0, 0, 1)
+                    text: "[font=Roboto]UPLOAD RECORDING[font=Roboto]"
+                    font_size: 0.035 * self.parent.width
+                    size_hint: 0.6, 0.5
+                    pos_hint: {"top": 0.75}
+                    on_release: app.upload_recording(recording_sc)
+
+    MDScreen:
+        id: tutorial_sc
+        name: "tutorial_screen"
+
+        MDTopAppBar:
+            id: tutorial_toolbar
+            markup: True
+            title: "[font=Roboto]Tutorial[font=Roboto]"
+            anchor_title: "center"
+            pos_hint: {"top": 1}
+            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Theme"]]
+            left_action_items: [["chevron-double-left", lambda x: root.switch_to(init_sc, direction='right'), "Select source"]]
+
+        MDSwiper:
+            size_hint: 0.8, 0.8
+            pos_hint: {"top": 0.85, "right": 0.9}
+
+            MDSwiperItem:
+                md_bg_color: app.theme_cls.primary_light
+                radius: [40, 40, 40, 40]
+
+                MDBoxLayout:
+                    orientation: "vertical"
+
+            MDSwiperItem:
+                md_bg_color: app.theme_cls.primary_light
+                radius: [40, 40, 40, 40]
+
+                MDBoxLayout:
+                    orientation: "vertical"
+
+            MDSwiperItem:
+                md_bg_color: app.theme_cls.primary_light
+                radius: [40, 40, 40, 40]
+
+                MDBoxLayout:
+                    orientation: "vertical"
+
+
+    MDScreen:
+        id: recording_sc
+        name: "recording_screen"
+
+        MDTopAppBar:
+            id: recording_topbar
+            markup: True
+            title: "[font=Roboto]AI COACH[font=Roboto]"
+            anchor_title: "center"
+            pos_hint: {"top": 1}
+            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Theme"]]
+            left_action_items: [["chevron-double-left", lambda x: app.return_from_capture(init_sc), "Change exercise"]]
+
+        MDRelativeLayout:
+            id: recording_display_layout
+            size_hint_y: 1.0 - recording_topbar.height/root.height - 0.1
+            pos_hint: {"top": 1.0 - recording_topbar.height/root.height}
+
+            Image:
+                id: recording_display
+                size: recording_display_layout.width, recording_display_layout.height
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+            MDCard:
+                orientation: "vertical"
+                md_bg_color: app.theme_cls.primary_light
+                size_hint: None, None
+                height: dp(60)
+                width: dp(75)
+                pos: (dp(5), dp(5))
+                radius: [8, 8, 8, 8]
+                padding: 5
+
+                MDLabel:
+                    id: recording_reps_display
+                    text: "REPS: 0"
+                    theme_text_color: "ContrastParentBackground"
+                    halign: "left"
+
+                MDLabel:
+                    id: recording_fps_display
+                    markup: True
+                    text: "FPS: 30"
+                    theme_text_color: "ContrastParentBackground"
+                    halign: "left"
+
+        MDBottomAppBar:
+            id: recording_bottombar
+            MDTopAppBar:
+                type: "bottom"
+                icon: "play-pause"
+                icon_color: app.theme_cls.primary_light
+                mode: "free-end"
+                on_action_button: app.start_stop_recording()
+                left_action_items: [["format-rotate-90", lambda x: app.rotate_video(recording_display), "Rotation"]]
+
+    MDScreen:
+        id: camera_sc
+        name: "camera_screen"
+
+        MDTopAppBar:
+            id: camera_topbar
+            markup: True
+            title: "[font=Roboto]AI COACH[font=Roboto]"
+            anchor_title: "center"
+            pos_hint: {"top": 1}
+            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Theme"]]
+            left_action_items: [["chevron-double-left", lambda x: app.return_from_capture(init_sc), "Change exercise"]]
+
+        MDRelativeLayout:
+            id: camera_display_layout
+            size_hint_y: 1.0 - recording_topbar.height/root.height - 0.1
+            pos_hint: {"top": 1.0 - recording_topbar.height/root.height}
+
+            Image:
+                id: camera_display
+                size: camera_display_layout.width, camera_display_layout.height
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+            MDCard:
+                orientation: "vertical"
+                md_bg_color: app.theme_cls.primary_light
+                size_hint: None, None
+                height: dp(60)
+                width: dp(75)
+                pos: (dp(5), dp(5))
+                radius: [8, 8, 8, 8]
+                padding: 5
+
+                MDLabel:
+                    id: camera_reps_display
+                    text: "REPS: 0"
+                    theme_text_color: "ContrastParentBackground"
+                    halign: "left"
+
+                MDLabel:
+                    id: camera_fps_display
+                    markup: True
+                    text: "FPS: 30"
+                    theme_text_color: "ContrastParentBackground"
+                    halign: "left"
+
+
+        MDBottomAppBar:
+            id: camera_bottombar
+            MDTopAppBar:
+                type: "bottom"
+                icon: "play-pause"
+                icon_color: app.theme_cls.primary_light
+                mode: "free-end"
+                left_action_items: [["format-rotate-90", lambda x: app.rotate_video(camera_display)]]
+
