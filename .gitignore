@@ -1,4 +1,6 @@
 /data/*
 /.idea/*
+/__pycache__/*
 /dokumenty/*
 */.ipynb_checkpoints/*
+*.egg-info/
