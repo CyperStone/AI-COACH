@@ -13,7 +13,8 @@ parser.add_argument('-c3', '--angle_cam_id', type=int, required=True, help=u'ID 
 args = parser.parse_args()
 
 data_path = f'..\\data\\{args.exercise_type}'
-max_video_num = max([int(filename.split('_')[0]) for filename in os.listdir(data_path)])
+max_video_num = max([int(filename.split('_')[0]) for filename in os.listdir(data_path)\
+                     if os.path.isfile(os.path.join(data_path, filename))])
 placement_dict = {'front': (150, 10), 'side': (600, 10), 'angle': (1050, 10)}
 
 start_event = threading.Event()

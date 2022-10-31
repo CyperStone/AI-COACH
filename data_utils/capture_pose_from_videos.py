@@ -90,7 +90,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     data_path = f'..\\data\\{args.exercise_type}'
-    max_video_num = max([int(file_name.split('_')[0]) for file_name in os.listdir(data_path)])
+    max_video_num = max([int(filename.split('_')[0]) for filename in os.listdir(data_path) \
+                         if os.path.isfile(os.path.join(data_path, filename))])
     video_num = args.video_num if args.video_num is not None else max_video_num
     placement_dict = {'front': (150, 10), 'side': (600, 10), 'angle': (1050, 10)}
 
