@@ -3,4 +3,4 @@
 /__pycache__/*
 /dokumenty/*
 */.ipynb_checkpoints/*
-*.egg-info/
+*/temp.html
