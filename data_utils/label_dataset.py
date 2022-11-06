@@ -3,6 +3,7 @@ sys.path.append('..')
 
 import os
 import cv2
+import time
 import msvcrt
 import argparse
 import numpy as np
@@ -10,6 +11,7 @@ import pandas as pd
 import mediapipe as mp
 import plotly.graph_objs as go
 import plotly.offline
+from datetime import timedelta
 from multiprocessing import Process
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QUrl
@@ -19,7 +21,7 @@ from utils import image_resize, extract_features_from_landmarks
 
 
 FRAMES_STEP = 5
-SET_STATE_MAPPING = {'q': 1, 'w': 2, 'e': 3}
+SET_STATE_MAPPING = {'q': 1, 'w': 2, 'e': 3, 'r': 4, 't': 5}
 ERROR_UNCERTAINTY_MAPPING = {'1': 1, '2': 2, '3': 3}
 SQUAT_ERRORS_MAPPING = {'z': 'RAISED_HEELS',
                         'x': 'KNEES_VALGUS',
@@ -138,17 +140,27 @@ def _get_features_info_string(features):
 
 def add_pose_estimation_results(df_row, estimation_result):
     pose_enum = mp.solutions.pose.PoseLandmark
-    landmarks = estimation_result.pose_world_landmarks.landmark
+
+    if estimation_result.pose_world_landmarks:
+        landmarks = estimation_result.pose_world_landmarks.landmark
 
     for enum in pose_enum:
         enum_name = enum.name
         enum_number = enum.numerator
-        landmark = landmarks[enum_number]
 
-        df_row[f'{enum_name}_X'] = landmark.x
-        df_row[f'{enum_name}_Y'] = landmark.y
-        df_row[f'{enum_name}_Z'] = landmark.z
-        df_row[f'{enum_name}_VISIBILITY'] = landmark.visibility
+        if estimation_result.pose_world_landmarks:
+            landmark = landmarks[enum_number]
+
+            df_row[f'{enum_name}_X'] = landmark.x
+            df_row[f'{enum_name}_Y'] = landmark.y
+            df_row[f'{enum_name}_Z'] = landmark.z
+            df_row[f'{enum_name}_VISIBILITY'] = landmark.visibility
+
+        else:
+            df_row[f'{enum_name}_X'] = None
+            df_row[f'{enum_name}_Y'] = None
+            df_row[f'{enum_name}_Z'] = None
+            df_row[f'{enum_name}_VISIBILITY'] = None
 
 
 def show_plot_window(figure):
@@ -171,24 +183,50 @@ if __name__ == '__main__':
                         choices=('squat', 'deadlift'))
     parser.add_argument('camera_type', type=str, help='Type of camera the videos were recorded',
                         choices=('front', 'side', 'angle'))
+    parser.add_argument('start_video_type', type=str, help='Whether to start labelling from the last video '
+                                                           'or from given video_id',
+                        choices=('last_video', 'given_video'))
     args = parser.parse_args()
 
     videos_path = f'..\\data\\{args.exercise_type}\\{args.camera_type}_camera'
     df_path = f'..\\data\\tabular_data\\{args.exercise_type}_{args.camera_type}.csv'
 
     df = pd.read_csv(df_path, sep=',')
-    max_video_id = df['VIDEO_ID'].max() + 1 if not np.isnan(df['VIDEO_ID'].max()) else 0
+
+    if args.start_video_type == 'last_video':
+        last_video_id = df['VIDEO_ID'].max() if not np.isnan(df['VIDEO_ID'].max()) else 0
+    else:
+        last_video_id = int(input('Provide video_id from which you want to start labelling: '))
+
+    df_last_video = df.loc[df['VIDEO_ID'] == last_video_id]
+    next_frame = df_last_video['FRAME'].max() + FRAMES_STEP if not np.isnan(df_last_video['FRAME'].max()) else 0
+
     mapping = EXERCISE_MAPPINGS[args.exercise_type]
 
-    video_names = sorted([file for file in os.listdir(videos_path) if int(file.split('.')[0]) >= max_video_id],
+    video_names = sorted([file for file in os.listdir(videos_path) if int(file.split('.')[0]) >= last_video_id],
                          key=lambda file: int(file.split('.')[0]))
 
     for video_name in video_names:
         video_id = int(video_name.split('.')[0])
         video_path = os.path.join(videos_path, video_name)
-        person_id = int(input(f'Type the ID of the person exercising on the recording number {video_id}: '))
 
         video = cv2.VideoCapture(video_path)
+        n_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+        frames_to_label = int(n_frames/FRAMES_STEP)
+
+        if video_id == last_video_id and next_frame >= n_frames:
+            print('All frames of last video has been labelled. Moving to the next video ...')
+            continue
+
+        print('-' * 80)
+        print(f'{args.exercise_type.upper()} VIDEO NUMBER {video_id}')
+
+        print('')
+        person_id = int(input(f'Type the ID of the person exercising on the recording number {video_id}: '))
+        print('')
+        print(f'Video number {video_id} has {n_frames} frames ({frames_to_label} to be labelled)')
+        t_start = time.time()
+
         pose_estimator = PoseEstimator()
 
         frame_num = 0
@@ -201,7 +239,9 @@ if __name__ == '__main__':
                 frame, width, height = image_resize(frame, height=600)
                 pose_estimator.estimate_pose(frame)
 
-                if frame_num % FRAMES_STEP == 0:
+                if (frame_num % FRAMES_STEP == 0) and ((video_id != last_video_id) or
+                                                       (video_id == last_video_id and frame_num >= next_frame)):
+
                     frame = pose_estimator.draw_landmarks((0, 0, 0), (255, 0, 0))
 
                     result = pose_estimator.last_results
@@ -215,6 +255,10 @@ if __name__ == '__main__':
                     plot_process.start()
                     image_process.start()
 
+                    print('')
+                    print('-' * 60)
+                    print(f'FRAME NUMBER {frame_num}')
+                    print('')
                     print('Provide the type of error')
                     error_msg = msvcrt.getwch()
 
@@ -225,11 +269,12 @@ if __name__ == '__main__':
 
                     if bytes(error_msg, 'utf-8') == b'\x1b':
                         end_video_event = True
-                        print(f'Skipped {args.exercise_type} ({args.camera_type}) recording number {video_id}')
+                        print('')
+                        print(f'Skipped {args.exercise_type} video number {video_id}')
 
                     elif bytes(error_msg, 'utf-8') == b'\r':
-                        print(f'Skipped the frame {frame_num} of {args.exercise_type} ({args.camera_type})'
-                              f' recording number {video_id}')
+                        print('')
+                        print(f'Skipped the frame {frame_num} of {args.exercise_type} video number {video_id}')
 
                     else:
                         new_row = pd.DataFrame({col: [0] for col in df.columns})
@@ -239,10 +284,14 @@ if __name__ == '__main__':
                         new_row['PERSON_ID'] = person_id
 
                         add_pose_estimation_results(new_row, result)
-                        print('Adding new row to dataset...')
+
+                        if error_msg == ' ':
+                            print('')
+                            print('Adding new row without errors')
 
                         while error_msg != ' ':
-                            print('Provide the uncertainty level of error')
+                            print('')
+                            print(f'Provide the uncertainty level of error {mapping[error_msg]}')
                             uncertainty_msg = msvcrt.getwch()
 
                             while uncertainty_msg not in ERROR_UNCERTAINTY_MAPPING.keys():
@@ -250,24 +299,29 @@ if __name__ == '__main__':
                                 uncertainty_msg = msvcrt.getwch()
 
                             new_row[mapping[error_msg]] = ERROR_UNCERTAINTY_MAPPING[uncertainty_msg]
-                            print(f'Labeled {mapping[error_msg]} error with '
+                            print('')
+                            print(f'Labelled {mapping[error_msg]} error with '
                                   f'{ERROR_UNCERTAINTY_MAPPING[uncertainty_msg]} uncertainty')
 
-                            print('\n', 'Provide the type of another error')
+                            print('')
+                            print('Provide the type of another error')
                             error_msg = msvcrt.getwch()
                             while error_msg not in mapping.keys() and error_msg != ' ':
                                 print('Incorrect error type key...')
                                 error_msg = msvcrt.getwch()
 
-                        print('\n', 'No more errors found...')
+                            if error_msg == ' ':
+                                print('')
+                                print('No more errors found')
+
+                        print('')
                         print('Provide the state of exercise set')
                         state_msg = msvcrt.getwch()
-                        while state_msg not in SET_STATE_MAPPING.keys() and state_msg != ' ':
+                        while state_msg not in SET_STATE_MAPPING.keys():
                             print('Incorrect set state key...')
                             state_msg = msvcrt.getwch()
 
-                        if state_msg != ' ':
-                            new_row['SET_STATE'] = SET_STATE_MAPPING[state_msg]
+                        new_row['SET_STATE'] = SET_STATE_MAPPING[state_msg]
 
                         df = pd.concat([df, new_row], ignore_index=True)
 
@@ -279,15 +333,25 @@ if __name__ == '__main__':
                     plot_process.join()
                     image_process.join()
 
+                    print('')
+                    print(f'ENDED LABELLING FRAME NUMBER {frame_num}')
+                    print('-' * 60)
+
                 frame_num += 1
             else:
                 break
 
         df.to_csv(df_path, index=False)
-        print('Saved labeling results to .csv file')
-        print('_' * 50)
+        print('Saved labelling results to .csv file')
+        print('')
+        print(f'FINISHED LABELLING OF {args.exercise_type.upper()} VIDEO NUMBER {video_id}')
 
-        print(f'Finished labeling of {args.exercise_type} ({args.camera_type}) recording number {video_id}')
+        print('')
+        duration = timedelta(seconds=(time.time() - t_start))
+        print(f'{frames_to_label} FRAMES HAS BEEN LABELLED (OR SKIPPED) IN {str(duration)}')
+        print('-' * 80)
+
+        print('')
         print('Push Esc key to exit or any other key to continue')
         msg = msvcrt.getwch()
 
