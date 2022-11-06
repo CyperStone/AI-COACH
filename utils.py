@@ -78,6 +78,7 @@ def extract_features_from_landmarks(estimation_result):
     features['feet_angle'] = 0
     features['hips_shoulders_angle'] = 0
     features['hips_wrists_angle'] = 0
+    features['hips_fingers_angle'] = 0
     features['hips_eyes_angle'] = 0
     features['head_up_down_angle'] = 0
     features['left_foot_angle'] = 0
@@ -155,6 +156,9 @@ def extract_features_from_landmarks(estimation_result):
     features['hips_wrists_angle'] = vg.angle(_vector_from_landmarks(landmarks, 'LEFT_HIP', 'RIGHT_HIP'),
                                              _vector_from_landmarks(landmarks, 'LEFT_WRIST', 'RIGHT_WRIST'),
                                              look=views['z'])
+    features['hips_fingers_angle'] = vg.angle(_vector_from_landmarks(landmarks, 'LEFT_HIP', 'RIGHT_HIP'),
+                                              _vector_from_landmarks(landmarks, 'LEFT_INDEX', 'RIGHT_INDEX'),
+                                              look=views['z'])
     features['hips_eyes_angle'] = vg.angle(_vector_from_landmarks(landmarks, 'LEFT_HIP', 'RIGHT_HIP'),
                                            _vector_from_landmarks(landmarks, 'LEFT_EYE', 'RIGHT_EYE'),
                                            look=views['y'])
