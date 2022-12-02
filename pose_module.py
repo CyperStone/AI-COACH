@@ -1,15 +1,16 @@
 import cv2
 import mediapipe.python.solutions.pose as mp_pose
 import mediapipe.python.solutions.drawing_utils as mp_draw
+from config import pose_module_config as pose_cnf
 
 
 class PoseEstimator:
 
     def __init__(self,
-                 model_complexity=1,
-                 min_detection_confidence=0.5,
-                 min_tracking_confidence=0.5,
-                 static_image_mode=False):
+                 model_complexity=pose_cnf.MODEL_COMPLEXITY,
+                 min_detection_confidence=pose_cnf.MIN_DETECTION_CONFIDENCE,
+                 min_tracking_confidence=pose_cnf.MIN_TRACKING_CONFIDENCE,
+                 static_image_mode=pose_cnf.STATIC_IMAGE_MODE):
 
         self.pose = mp_pose.Pose(
             model_complexity=model_complexity,
@@ -31,16 +32,52 @@ class PoseEstimator:
         self.last_results = self.pose.process(cv2.cvtColor(self.last_img, cv2.COLOR_BGR2RGB))
         self.last_img.flags.writeable = True
 
-    def draw_landmarks(self, landmark_color, connection_color, is_mistake=None):
-        if is_mistake:
-            mp_draw.draw_landmarks(self.last_img, self.last_results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-                                   mp_draw.DrawingSpec(color=(0, 0, 255), thickness=2, circle_radius=2),
-                                   mp_draw.DrawingSpec(color=(0, 0, 255), thickness=4, circle_radius=4))
-            cv2.rectangle(self.last_img, (0, 0), (self.img_width, self.img_height), (0, 0, 255), 5)
+        return self.last_results
+
+    def draw_landmarks(self, landmark_color, connection_color, event=None):
+
+        if event:
+            mp_draw.draw_landmarks(
+                self.last_img,
+                self.last_results.pose_landmarks,
+                mp_pose.POSE_CONNECTIONS,
+                mp_draw.DrawingSpec(color=landmark_color,
+                                    thickness=pose_cnf.LANDMARKS_THICKNESS,
+                                    circle_radius=pose_cnf.LANDMARKS_RADIUS),
+                mp_draw.DrawingSpec(color=event['color'],
+                                    thickness=pose_cnf.LANDMARK_CONNECTIONS_THICKNESS,
+                                    circle_radius=pose_cnf.LANDMARK_CONNECTIONS_RADIUS)
+            )
+
+            cv2.rectangle(
+                self.last_img,
+                (0, 0),
+                (self.img_width, self.img_height),
+                event['color'],
+                pose_cnf.EVENT_BORDER_THICKNESS
+            )
+            cv2.putText(
+                img=self.last_img,
+                text=event['text'],
+                org=(pose_cnf.EVENT_TEXT_POS_WIDTH, self.img_height - pose_cnf.EVENT_TEXT_POS_HEIGHT),
+                fontFace=cv2.FONT_HERSHEY_COMPLEX,
+                fontScale=pose_cnf.EVENT_TEXT_FONT_SCALE,
+                color=event['color'],
+                thickness=pose_cnf.EVENT_TEXT_FONT_THICKNESS,
+                bottomLeftOrigin=True
+            )
 
         else:
-            mp_draw.draw_landmarks(self.last_img, self.last_results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-                                   mp_draw.DrawingSpec(color=landmark_color, thickness=2, circle_radius=2),
-                                   mp_draw.DrawingSpec(color=connection_color, thickness=4, circle_radius=4))
+            mp_draw.draw_landmarks(
+                self.last_img,
+                self.last_results.pose_landmarks,
+                mp_pose.POSE_CONNECTIONS,
+                mp_draw.DrawingSpec(color=landmark_color,
+                                    thickness=pose_cnf.LANDMARKS_THICKNESS,
+                                    circle_radius=pose_cnf.LANDMARKS_RADIUS),
+                mp_draw.DrawingSpec(color=connection_color,
+                                    thickness=pose_cnf.LANDMARK_CONNECTIONS_THICKNESS,
+                                    circle_radius=pose_cnf.LANDMARK_CONNECTIONS_RADIUS)
+            )
 
         return self.last_img
