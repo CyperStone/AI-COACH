@@ -9,6 +9,7 @@ import argparse
 import numpy as np
 import pandas as pd
 import mediapipe as mp
+import pygetwindow as gw
 import plotly.graph_objs as go
 import plotly.offline
 from datetime import timedelta
@@ -22,6 +23,7 @@ from utils import image_resize, extract_features_from_landmarks
 
 FRAMES_STEP = 5
 SET_STATE_MAPPING = {'q': 1, 'w': 2, 'e': 3, 'r': 4, 't': 5}
+SET_STATE_NAMES = {'q': 'INITIAL PHASE', 'w': 'MOVING DOWN', 'e': 'BOTTOM PHASE', 'r': 'MOVING UP', 't': 'BEFORE/AFTER'}
 ERROR_UNCERTAINTY_MAPPING = {'1': 1, '2': 2, '3': 3}
 SQUAT_ERRORS_MAPPING = {'z': 'RAISED_HEELS',
                         'x': 'KNEES_VALGUS',
@@ -33,6 +35,7 @@ SQUAT_ERRORS_MAPPING = {'z': 'RAISED_HEELS',
 DEADLIFT_ERRORS_MAPPING = {}
 EXERCISE_MAPPINGS = {'squat': SQUAT_ERRORS_MAPPING,
                      'deadlift': DEADLIFT_ERRORS_MAPPING}
+
 
 class PoseViewer(QtWebEngineWidgets.QWebEngineView):
 
@@ -188,6 +191,9 @@ if __name__ == '__main__':
                         choices=('last_video', 'given_video'))
     args = parser.parse_args()
 
+    console_title = [title for title in gw.getAllTitles() if 'label_dataset.py' in title and 'Anaconda Prompt' in title][0]
+    console_window = gw.getWindowsWithTitle(console_title)[0]
+
     videos_path = f'..\\data\\{args.exercise_type}\\{args.camera_type}_camera'
     df_path = f'..\\data\\tabular_data\\{args.exercise_type}_{args.camera_type}.csv'
 
@@ -255,11 +261,15 @@ if __name__ == '__main__':
                     plot_process.start()
                     image_process.start()
 
+                    time.sleep(0.05)
+                    console_window.minimize()
+                    console_window.restore()
+
                     print('')
                     print('-' * 60)
                     print(f'FRAME NUMBER {frame_num}')
                     print('')
-                    print('Provide the type of error')
+                    print('|Provide the type of error|')
                     error_msg = msvcrt.getwch()
 
                     while error_msg not in mapping.keys() and error_msg != ' ' and\
@@ -287,11 +297,11 @@ if __name__ == '__main__':
 
                         if error_msg == ' ':
                             print('')
-                            print('Adding new row without errors')
+                            print('Adding new row without errors...')
 
                         while error_msg != ' ':
                             print('')
-                            print(f'Provide the uncertainty level of error {mapping[error_msg]}')
+                            print(f'|Provide the uncertainty level of error {mapping[error_msg]}|')
                             uncertainty_msg = msvcrt.getwch()
 
                             while uncertainty_msg not in ERROR_UNCERTAINTY_MAPPING.keys():
@@ -300,11 +310,11 @@ if __name__ == '__main__':
 
                             new_row[mapping[error_msg]] = ERROR_UNCERTAINTY_MAPPING[uncertainty_msg]
                             print('')
-                            print(f'Labelled {mapping[error_msg]} error with '
+                            print(f'Labelled as {mapping[error_msg]} error with '
                                   f'{ERROR_UNCERTAINTY_MAPPING[uncertainty_msg]} uncertainty')
 
                             print('')
-                            print('Provide the type of another error')
+                            print('|Provide the type of another error|')
                             error_msg = msvcrt.getwch()
                             while error_msg not in mapping.keys() and error_msg != ' ':
                                 print('Incorrect error type key...')
@@ -312,16 +322,18 @@ if __name__ == '__main__':
 
                             if error_msg == ' ':
                                 print('')
-                                print('No more errors found')
+                                print('No more errors found...')
 
                         print('')
-                        print('Provide the state of exercise set')
+                        print('|Provide the state of exercise set|')
                         state_msg = msvcrt.getwch()
                         while state_msg not in SET_STATE_MAPPING.keys():
                             print('Incorrect set state key...')
                             state_msg = msvcrt.getwch()
 
                         new_row['SET_STATE'] = SET_STATE_MAPPING[state_msg]
+                        print('')
+                        print(f'Labelled set state as {SET_STATE_NAMES[state_msg]}')
 
                         df = pd.concat([df, new_row], ignore_index=True)
 
