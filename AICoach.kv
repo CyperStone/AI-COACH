@@ -1,6 +1,10 @@
 Interface:
 
 <Interface>:
+    camera_display: camera_display.__self__
+    recording_display: recording_display.__self__
+    tutorial_text: tutorial_text.__self__
+
     id: sm
     init_sc: init_sc.__self__
     source_sc: source_sc.__self__
@@ -14,8 +18,8 @@ Interface:
             title: "[font=Roboto]SELECT EXERCISE[font=Roboto]"
             anchor_title: "center"
             pos_hint: {"top": 1}
-            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Theme"]]
-            left_action_items: [["alert-circle-outline", lambda x: root.switch_to(tutorial_sc, direction='left'), "Tutorial"]]
+            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Change theme"]]
+            left_action_items: [["help-circle-outline", lambda x: root.switch_to(tutorial_sc, direction='left'), "Tutorial"]]
 
         MDBoxLayout:
             orientation: "vertical"
@@ -30,7 +34,7 @@ Interface:
                 padding: [10, 0, 20, 0]
 
                 Image:
-                    source: "./img/deadlift_icon.png"
+                    source: "./assets/images/deadlift_icon.png"
                     size_hint: 0.3, 1
 
                 MDRectangleFlatButton:
@@ -41,7 +45,7 @@ Interface:
                     font_size: 0.04 * self.parent.width
                     size_hint: 0.7, 0.5
                     pos_hint: {"top": 0.75}
-                    on_release: app.select_exercise(self, source_sc)
+                    # on_release: app.select_exercise(self, source_sc)
 
             MDCard:
                 md_bg_color: app.theme_cls.primary_light
@@ -50,7 +54,7 @@ Interface:
                 padding: [10, 0, 20, 0]
 
                 Image:
-                    source: "./img/squat_icon.png"
+                    source: "./assets/images/squat_icon.png"
                     size_hint: 0.3, 0.9
                     pos_hint: {"top": 0.95}
 
@@ -73,7 +77,7 @@ Interface:
             title: "[font=Roboto]SELECT SOURCE[font=Roboto]"
             anchor_title: "center"
             pos_hint: {"top": 1}
-            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Theme"]]
+            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Change theme"]]
             left_action_items: [["chevron-double-left", lambda x: root.switch_to(init_sc, direction='right'), "Change exercise"]]
 
         MDBoxLayout:
@@ -89,7 +93,7 @@ Interface:
                 padding: [10, 0, 20, 0]
 
                 Image:
-                    source: "./img/live_icon.png"
+                    source: "./assets/images/live_icon.png"
                     size_hint: 0.4, 0.8
                     pos_hint: {"top": 0.9}
 
@@ -101,7 +105,7 @@ Interface:
                     font_size: 0.035 * self.parent.width
                     size_hint: 0.6, 0.5
                     pos_hint: {"top": 0.75}
-                    on_release: app.live_workout(camera_sc)
+                    on_release: app.live_workout(screen=camera_sc)
 
             MDCard:
                 md_bg_color: app.theme_cls.primary_light
@@ -110,7 +114,7 @@ Interface:
                 padding: [10, 0, 20, 0]
 
                 Image:
-                    source: "./img/upload_icon.png"
+                    source: "./assets/images/upload_icon.png"
                     size_hint: 0.4, 0.8
                     pos_hint: {"top": 0.9}
 
@@ -137,31 +141,22 @@ Interface:
             right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Theme"]]
             left_action_items: [["chevron-double-left", lambda x: root.switch_to(init_sc, direction='right'), "Select source"]]
 
-        MDSwiper:
+        MDCard:
+            orientation: "vertical"
+            md_bg_color: app.theme_cls.primary_light
+            size_hint: None, None
             size_hint: 0.8, 0.8
             pos_hint: {"top": 0.85, "right": 0.9}
+            radius: [12, 12, 12, 12]
+            padding: 5
 
-            MDSwiperItem:
-                md_bg_color: app.theme_cls.primary_light
-                radius: [40, 40, 40, 40]
-
-                MDBoxLayout:
-                    orientation: "vertical"
-
-            MDSwiperItem:
-                md_bg_color: app.theme_cls.primary_light
-                radius: [40, 40, 40, 40]
-
-                MDBoxLayout:
-                    orientation: "vertical"
-
-            MDSwiperItem:
-                md_bg_color: app.theme_cls.primary_light
-                radius: [40, 40, 40, 40]
-
-                MDBoxLayout:
-                    orientation: "vertical"
-
+            MDLabel:
+                id: tutorial_text
+                markup: True
+                text: ""
+                theme_text_color: "ContrastParentBackground"
+                halign: "left"
+                font_size: 14
 
     MDScreen:
         id: recording_sc
@@ -173,8 +168,8 @@ Interface:
             title: "[font=Roboto]AI COACH[font=Roboto]"
             anchor_title: "center"
             pos_hint: {"top": 1}
-            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Theme"]]
-            left_action_items: [["chevron-double-left", lambda x: app.return_from_capture(init_sc), "Change exercise"]]
+            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Change theme"]]
+            left_action_items: [["chevron-double-left", lambda x: app.return_from_capture(init_sc, recording_bottombar_main), "Change exercise"]]
 
         MDRelativeLayout:
             id: recording_display_layout
@@ -190,7 +185,7 @@ Interface:
                 orientation: "vertical"
                 md_bg_color: app.theme_cls.primary_light
                 size_hint: None, None
-                height: dp(60)
+                height: dp(40)
                 width: dp(75)
                 pos: (dp(5), dp(5))
                 radius: [8, 8, 8, 8]
@@ -202,22 +197,18 @@ Interface:
                     theme_text_color: "ContrastParentBackground"
                     halign: "left"
 
-                MDLabel:
-                    id: recording_fps_display
-                    markup: True
-                    text: "FPS: 30"
-                    theme_text_color: "ContrastParentBackground"
-                    halign: "left"
-
         MDBottomAppBar:
             id: recording_bottombar
+
             MDTopAppBar:
+                id: recording_bottombar_main
                 type: "bottom"
-                icon: "play-pause"
+                icon: "play"
                 icon_color: app.theme_cls.primary_light
                 mode: "free-end"
-                on_action_button: app.start_stop_recording()
-                left_action_items: [["format-rotate-90", lambda x: app.rotate_video(recording_display), "Rotation"]]
+                on_action_button: app.start_stop_recording(recording_bottombar_main)
+                left_action_items: [["format-rotate-90", lambda x: app.rotate_video(recording_display), "Rotate"]]
+                right_action_items: [["volume-off", lambda x: app.change_sound(recording_bottombar_main), "Turn on sound"]]
 
     MDScreen:
         id: camera_sc
@@ -229,8 +220,8 @@ Interface:
             title: "[font=Roboto]AI COACH[font=Roboto]"
             anchor_title: "center"
             pos_hint: {"top": 1}
-            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Theme"]]
-            left_action_items: [["chevron-double-left", lambda x: app.return_from_capture(init_sc), "Change exercise"]]
+            right_action_items: [["circle-half-full", lambda x: app.change_theme(), "Change theme"]]
+            left_action_items: [["chevron-double-left", lambda x: app.return_from_capture(init_sc, camera_bottombar_main), "Change exercise"]]
 
         MDRelativeLayout:
             id: camera_display_layout
@@ -246,7 +237,7 @@ Interface:
                 orientation: "vertical"
                 md_bg_color: app.theme_cls.primary_light
                 size_hint: None, None
-                height: dp(60)
+                height: dp(40)
                 width: dp(75)
                 pos: (dp(5), dp(5))
                 radius: [8, 8, 8, 8]
@@ -258,20 +249,16 @@ Interface:
                     theme_text_color: "ContrastParentBackground"
                     halign: "left"
 
-                MDLabel:
-                    id: camera_fps_display
-                    markup: True
-                    text: "FPS: 30"
-                    theme_text_color: "ContrastParentBackground"
-                    halign: "left"
-
-
         MDBottomAppBar:
             id: camera_bottombar
+
             MDTopAppBar:
+                id: camera_bottombar_main
                 type: "bottom"
-                icon: "play-pause"
+                icon: "camera-flip-outline"
                 icon_color: app.theme_cls.primary_light
                 mode: "free-end"
-                left_action_items: [["format-rotate-90", lambda x: app.rotate_video(camera_display)]]
+                on_action_button: app.change_camera()
+                left_action_items: [["format-rotate-90", lambda x: app.rotate_video(camera_display), "Rotate"]]
+                right_action_items: [["volume-high", lambda x: app.change_sound(camera_bottombar_main), "Turn off sound"]]
 
