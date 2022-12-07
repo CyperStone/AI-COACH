@@ -139,19 +139,19 @@ class SquatModule:
 
         state = self.state_queue.update_predict(state_pred)
 
-        if not self.start and squat_cnf.STATE_DICT[state] in ('MOVING_UP/DOWN', 'BOTTOM_PHASE'):
-            self.start = True
-            self.stop = False
-            response['START_EVENT'] = True
-
-        elif self.start and not self.stop and squat_cnf.STATE_DICT[state] == 'BEFORE/AFTER_SET':
-            self.stop = True
-            self.start = False
-            response['STOP_EVENT'] = True
-
         if state != self.current_state:
             self.last_state = self.current_state
             self.current_state = state
+
+            if not self.start and squat_cnf.STATE_DICT[self.current_state] in ('MOVING_UP/DOWN', 'BOTTOM_PHASE'):
+                self.start = True
+                self.stop = False
+                response['START_EVENT'] = True
+
+            elif self.start and not self.stop and squat_cnf.STATE_DICT[self.current_state] == 'BEFORE/AFTER_SET':
+                self.stop = True
+                self.start = False
+                response['STOP_EVENT'] = True
 
             if self.start:
                 if squat_cnf.STATE_DICT[self.current_state] == 'INITIAL_PHASE' and \
@@ -250,6 +250,7 @@ class SquatModule:
 
                     X_raising_heels = X_init_state_features.loc[:, squat_cnf.RAISING_HEELS_INPUT_COLS]
                     raising_heels_proba = self.raising_heels_model.predict_proba(X_raising_heels)[0][1]
+
                     if not self.errors['RAISING_HEELS']:
 
                         raising_heels_pred = raising_heels_proba > squat_cnf.RAISING_HEELS_PROBA_THRESHOLD

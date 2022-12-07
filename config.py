@@ -267,7 +267,7 @@ squat_module_config = SimpleNamespace(
     ],
     RAISING_HEELS_QUEUE_SIZE=6,
     RAISING_HEELS_QUEUE_THRESHOLD=4,
-    RAISING_HEELS_PROBA_THRESHOLD=0.5,
+    RAISING_HEELS_PROBA_THRESHOLD=0.8,
     RAISING_HEELS_INPUT_COLS=[
         'mean_knees_x_view_angle',
         'mean_torso_x_view_angle',
