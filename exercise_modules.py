@@ -115,7 +115,8 @@ class SquatModule:
             state_pred = squat_cnf.STATE_DICT_REVERSED['BEFORE/AFTER_SET']
 
         else:
-            X = pd.DataFrame({k: [v] for k, v in extract_features_from_landmarks(estimation_results).items()})
+            X = pd.DataFrame({k: [v] for k, v in
+                              extract_features_from_landmarks(estimation_results, self.init_state_features).items()})
 
             X_state = X.loc[:, squat_cnf.STATE_INPUT_COLS]
             pred_proba = self.state_model.predict_proba(X_state)[0]

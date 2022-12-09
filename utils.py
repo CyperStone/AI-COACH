@@ -158,7 +158,7 @@ def _distance_between_landmarks(landmarks, l1, l2, look=None):
     return np.linalg.norm(vector)
 
 
-def extract_features_from_landmarks(estimation_result):
+def extract_features_from_landmarks(estimation_result, init_state_features):
     views = {'x': np.array([1, 0, 0]),
              'y': np.array([0, 1, 0]),
              'z': np.array([0, 0, 1])}
@@ -325,5 +325,9 @@ def extract_features_from_landmarks(estimation_result):
     features['elbows_z_view_angle_diff'] = features['left_elbow_z_view_angle'] - features['right_elbow_z_view_angle']
     features['wrists_shoulders_x_dist_diff'] = features['left_wrist_shoulder_x_dist'] - features[
         'right_wrist_shoulder_x_dist']
+
+    if init_state_features is not None:
+        features['knees_ankles_x_dist_diff_test'] = features['knees_ankles_x_dist_diff'] -\
+                                                    init_state_features['knees_ankles_x_dist_diff_init'].values[0]
 
     return features

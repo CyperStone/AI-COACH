@@ -194,8 +194,7 @@ squat_module_config = SimpleNamespace(
         'right_shin_z_view_signed_angle_init',
         'left_shin_z_view_signed_angle',
         'right_shin_z_view_signed_angle',
-        'knees_ankles_x_dist_diff_init',
-        'knees_ankles_x_dist_diff'
+        'knees_ankles_x_dist_diff_test'
     ],
     COLLAPSED_TORSO_QUEUE_SIZE=9,
     COLLAPSED_TORSO_QUEUE_THRESHOLD=6,
