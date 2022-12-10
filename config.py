@@ -82,6 +82,15 @@ app_config = SimpleNamespace(
            should be facing the camera perfectly
         - video stream should be of good
            quality (lighting, resolution)
+    
+    4. Training assistant system tracks the
+        person who is performing the exercise.
+        If the system detects a technical error
+        made by the user, appropriate messages
+        will appear on the screen. The app will
+        also play voice guidance, which advises
+        the user on fixing specific error during
+        the next exercise repetition.
     """
 )
 
@@ -179,7 +188,7 @@ squat_module_config = SimpleNamespace(
     COLLAPSING_KNEES_QUEUE_SIZE=6,
     COLLAPSING_KNEES_QUEUE_THRESHOLD=4,
     COLLAPSING_KNEES_PROBA_THRESHOLD=0.5,
-    COLLAPSING_KNEES_AFTER_COLLAPSED_TORSO_PROBA_THRESHOLD=0.9,
+    COLLAPSING_KNEES_AFTER_COLLAPSED_TORSO_PROBA_THRESHOLD=0.8,
     COLLAPSING_KNEES_INPUT_COLS=[
         'mean_knees_x_view_angle',
         'mean_torso_x_view_angle',
