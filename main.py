@@ -246,6 +246,7 @@ class AICoachAPP(MDApp):
             bottom_bar.icon = app_config.ICONS['VIDEO_PAUSE']
 
     def update_screen(self, *args, display=None, reps_display=None, bottom_bar=None):
+        # print((int(Clock.get_fps()))
         texture = self.process_frame(reps_display)
 
         if texture:

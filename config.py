@@ -165,7 +165,7 @@ squat_module_config = SimpleNamespace(
         'BOTTOM_PHASE': 2,
         'BEFORE/AFTER_SET': 3
     },
-    ECCENTRIC_PHASE_TIME_THRESHOLD=0.35,     # seconds
+    ECCENTRIC_PHASE_TIME_THRESHOLD=0.55,     # seconds
     INIT_STATE_FEATURES_MIN_SAMPLES=15,
     INIT_STATE_FEATURES_FRACTION_CUT=0.1,
     INIT_STATE_FEATURES_COLS=[
@@ -235,8 +235,8 @@ squat_module_config = SimpleNamespace(
         'right_wrist_shoulder_z_dist'
     ],
     HIP_SHIFT_BUFFER_SIZE=20,
-    HIP_SHIFT_QUEUE_SIZE=6,
-    HIP_SHIFT_QUEUE_THRESHOLD=4,
+    HIP_SHIFT_QUEUE_SIZE=9,
+    HIP_SHIFT_QUEUE_THRESHOLD=6,
     HIP_SHIFT_PROBA_THRESHOLD=0.5,
     HIP_SHIFT_INPUT_COLS=[
         'mean_knees_x_view_angle',
@@ -275,7 +275,7 @@ squat_module_config = SimpleNamespace(
     ],
     RAISING_HEELS_QUEUE_SIZE=6,
     RAISING_HEELS_QUEUE_THRESHOLD=4,
-    RAISING_HEELS_PROBA_THRESHOLD=0.8,
+    RAISING_HEELS_PROBA_THRESHOLD=0.99,
     RAISING_HEELS_INPUT_COLS=[
         'mean_knees_x_view_angle',
         'mean_torso_x_view_angle',

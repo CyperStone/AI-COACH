@@ -158,7 +158,7 @@ def _distance_between_landmarks(landmarks, l1, l2, look=None):
     return np.linalg.norm(vector)
 
 
-def extract_features_from_landmarks(estimation_result, init_state_features):
+def extract_features_from_landmarks(estimation_result, init_state_features=None):
     views = {'x': np.array([1, 0, 0]),
              'y': np.array([0, 1, 0]),
              'z': np.array([0, 0, 1])}
