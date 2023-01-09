@@ -12,3 +12,21 @@
 ![screen-gif](https://user-images.githubusercontent.com/67295703/211409049-0c68165c-6d5d-4e5b-8789-9fda4d686ece.gif)
 
 ## Getting Started
+1. Clone the repository to your local machine and navigate to the project directory:
+```
+git clone https://github.com/CyperStone/AI-COACH.git
+```
+2. Create and activate new environment with Python 3.10 (example with using Anaconda):
+```
+conda create -n myenv python=3.10
+conda activate myenv
+```
+3. Install required packages:
+```
+conda install pip
+pip install -r requirements.txt
+```
+4. Run the application, simply using the following command:
+```
+python main.py
+```
