@@ -1,6 +1,7 @@
 ![logo_orange_github](https://user-images.githubusercontent.com/67295703/210141583-54b227d8-c796-45c4-9857-f42537faaa0d.png)
 
 ### Prototype of application which helps newbies in strength training
+### Thesis Paper - ["Strength training assistant system using computer vision"](https://github.com/CyperStone/AI-COACH/blob/main/thesis_paper.pdf) [PL]
 
 
 ## Project Overview
